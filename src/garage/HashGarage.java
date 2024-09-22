@@ -10,12 +10,11 @@ public class HashGarage implements Garage {
     private final HashMap<Integer, Owner>   owners = new HashMap<>();
     private final HashMap<String,  List<Car>>   brands = new HashMap<>();
     private final HashMap<Integer, List<Car>> property = new HashMap<>();
-//    private Map<Owner, List<Car>> garage;
 
     public HashGarage(Map<Owner, List<Car>> garage) {
 
-        Comparator<Car> comparatorVelocity = Comparator.comparing(Car::maxVelocity);
-        Comparator<Car> comparatorPower    = Comparator.comparing(Car::power);
+        Comparator<Car> comparatorVelocity = Comparator.comparing(Car::maxVelocity).thenComparing(Car::carId);
+        Comparator<Car> comparatorPower    = Comparator.comparing(Car::      power).thenComparing(Car::carId);
         carsByVelocity = new TreeSet<>(comparatorVelocity);
         carsByPower    = new TreeSet<>(comparatorPower);
 
@@ -46,8 +45,15 @@ public class HashGarage implements Garage {
 
     @Override
     public Collection<Car> topThreeCarsByMaxVelocity() {
-
-        return List.of();
+        if (carsByVelocity.size() > 2) {
+            List<Car> top3 = new ArrayList<>();
+            Iterator<Car> iterator = carsByVelocity.descendingIterator();
+            for (int i = 0; i < 3 && iterator.hasNext(); i++) {
+                top3.add(iterator.next());
+            }
+            return top3;
+        }
+        return carsByVelocity.descendingSet();
     }
 
     @Override
@@ -60,7 +66,17 @@ public class HashGarage implements Garage {
 
     @Override
     public Collection<Car> carsWithPowerMoreThan(int power) {
-        return List.of();
+        try{
+            return carsByPower.tailSet(new Car(0,
+                    "",
+                    "",
+                    0,
+                    power,
+                    0), false);
+        }
+        catch (Exception e){
+            return List.of();
+        }
     }
 
     @Override
@@ -73,21 +89,31 @@ public class HashGarage implements Garage {
 
     @Override
     public int meanOwnersAgeOfCarBrand(String brand) {
-        return 0;
+        float res = 0.f;
+        HashSet<Owner> people = new HashSet<>();
+        for (Car car : cars.values()) {
+            if (car.brand().equals(brand) && people.add(owners.get(car.ownerId()))) {
+                res += (float) owners.get(car.ownerId()).age();
+            }
+        }
+        return !people.isEmpty() ? Math.round(res / people.size()) : 0;
     }
 
     @Override
     public int meanCarNumberForEachOwner() {
-        return 0;
+        float res = property.values().stream().mapToInt(List::size).sum();
+        return res > 0 ? Math.round(res / property.values().size()) : 0;
     }
 
     @Override
     public Car removeCar(int carId) {
         if (cars.containsKey(carId)) {
-              brands.get(cars.get(carId).brand()).remove(carId);
-        }
-        if (cars.containsKey(carId)) {
-            property.get(cars.get(carId).ownerId()).remove(carId);
+            Car car = cars.get(carId);
+              brands.get(car.  brand()).remove(car);
+            property.get(car.ownerId()).remove(car);
+            if (allCarsOfOwner(owners.get(car.ownerId())).isEmpty()) {
+                owners.remove(car.ownerId());
+            }
         }
         return cars.remove(carId);
     }
@@ -109,16 +135,6 @@ public class HashGarage implements Garage {
         else{
             property.put(owner.ownerId(), new ArrayList<>(List.of(car)));
         }
-
-
-    }
-
-    public HashMap<Integer, Owner> getOwners() {
-        return owners;
-    }
-
-    public HashMap<Integer, Car> getCars() {
-        return cars;
     }
 
     public void soutOwners(){
@@ -135,6 +151,18 @@ public class HashGarage implements Garage {
     public void soutCars(){
         cars.forEach((id, car) -> {
             System.out.println("Car ID: " + car.carId() + ", Car: " + car.brand() + " " + car.modelName());
+        });
+    }
+
+    public void soutCarsByVelocity(){
+        carsByVelocity.forEach(car -> {
+            System.out.println("Car ID: " + car.carId() + ", Car: " + car.brand() + " " + car.modelName() + " " + car.maxVelocity() + " " + car.power());
+        });
+    }
+
+    public void soutCarsByPower(){
+        carsByVelocity.forEach(car -> {
+            System.out.println("Car ID: " + car.carId() + ", Car: " + car.brand() + " " + car.modelName() + " " + car.maxVelocity() + " " + car.power());
         });
     }
 
