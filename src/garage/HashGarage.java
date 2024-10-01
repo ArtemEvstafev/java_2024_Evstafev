@@ -8,8 +8,8 @@ public class HashGarage implements Garage {
     private final NavigableSet<Car>   carsByPower;
     private final HashMap<Integer,   Car>     cars = new HashMap<>();
     private final HashMap<Integer, Owner>   owners = new HashMap<>();
-    private final HashMap<String,  List<Car>>   brands = new HashMap<>();
-    private final HashMap<Integer, List<Car>> property = new HashMap<>();
+    private final HashMap<String,  Set<Car>>   brands = new HashMap<>();
+    private final HashMap<Integer, Set<Car>> property = new HashMap<>();
 
     public HashGarage(Map<Owner, List<Car>> garage) {
 
@@ -22,7 +22,7 @@ public class HashGarage implements Garage {
 
             Owner owner = entry.getKey();
             owners  .put(owner.ownerId(), owner);
-            property.put(owner.ownerId(), new ArrayList<>());
+            property.put(owner.ownerId(), new HashSet<>());
             for (Car car : entry.getValue()) {
                 carsByPower   .add(car);
                 carsByVelocity.add(car);
@@ -32,7 +32,7 @@ public class HashGarage implements Garage {
                     brands.get(car.brand()).add(car);
                 }
                 else{
-                    brands.put(car.brand(), new ArrayList<>(List.of(car)));
+                    brands.put(car.brand(), new HashSet<>(List.of(car)));
                 }
             }
         }
@@ -101,7 +101,7 @@ public class HashGarage implements Garage {
 
     @Override
     public int meanCarNumberForEachOwner() {
-        float res = property.values().stream().mapToInt(List::size).sum();
+        float res = property.values().stream().mapToInt(Set::size).sum();
         return res > 0 ? Math.round(res / property.values().size()) : 0;
     }
 
@@ -133,13 +133,13 @@ public class HashGarage implements Garage {
             brands.get(car.brand()).add(car);
         }
         else{
-            brands.put(car.brand(), new ArrayList<>(List.of(car)));
+            brands.put(car.brand(), new HashSet<>(List.of(car)));
         }
         if (property.containsKey(owner.ownerId())) {
             property.get(owner.ownerId()).add(car);
         }
         else{
-            property.put(owner.ownerId(), new ArrayList<>(List.of(car)));
+            property.put(owner.ownerId(), new HashSet<>(List.of(car)));
         }
     }
 }
