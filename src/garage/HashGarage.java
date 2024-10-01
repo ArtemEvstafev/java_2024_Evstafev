@@ -109,8 +109,12 @@ public class HashGarage implements Garage {
     public Car removeCar(int carId) {
         if (cars.containsKey(carId)) {
             Car car = cars.get(carId);
+
               brands.get(car.  brand()).remove(car);
             property.get(car.ownerId()).remove(car);
+            carsByVelocity.remove(car);
+            carsByPower   .remove(car);
+
             if (allCarsOfOwner(owners.get(car.ownerId())).isEmpty()) {
                 owners.remove(car.ownerId());
             }
@@ -122,6 +126,8 @@ public class HashGarage implements Garage {
     public void addNewCar(Car car, Owner owner) {
         owners.put(owner.ownerId(), owner);
           cars.put(  car.  carId(),   car);
+        carsByVelocity.add(car);
+        carsByPower   .add(car);
 
         if (brands.containsKey(car.brand())) {
             brands.get(car.brand()).add(car);
@@ -135,45 +141,5 @@ public class HashGarage implements Garage {
         else{
             property.put(owner.ownerId(), new ArrayList<>(List.of(car)));
         }
-    }
-
-    public void soutOwners(){
-        owners.forEach((id, owner) -> {
-            System.out.println("Owner ID: " + owner.ownerId() + ", Owner: " + owner.name() + " " + owner.lastName() + ", Age: " + owner.age());
-        });
-    }
-
-    public void soutGarage(){
-        soutOwners();
-        soutCars();
-    }
-
-    public void soutCars(){
-        cars.forEach((id, car) -> {
-            System.out.println("Car ID: " + car.carId() + ", Car: " + car.brand() + " " + car.modelName());
-        });
-    }
-
-    public void soutCarsByVelocity(){
-        carsByVelocity.forEach(car -> {
-            System.out.println("Car ID: " + car.carId() + ", Car: " + car.brand() + " " + car.modelName() + " " + car.maxVelocity() + " " + car.power());
-        });
-    }
-
-    public void soutCarsByPower(){
-        carsByVelocity.forEach(car -> {
-            System.out.println("Car ID: " + car.carId() + ", Car: " + car.brand() + " " + car.modelName() + " " + car.maxVelocity() + " " + car.power());
-        });
-    }
-
-    public void soutBrands(){
-//        System.out.println(brands);
-        brands.forEach((brand, ids) -> {
-            System.out.print(brand + " ");
-            ids.forEach(id -> {
-                System.out.print(id + " ");
-            });
-            System.out.println('\n');
-        });
     }
 }
