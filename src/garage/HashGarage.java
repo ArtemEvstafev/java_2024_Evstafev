@@ -101,8 +101,7 @@ public class HashGarage implements Garage {
 
     @Override
     public int meanCarNumberForEachOwner() {
-        float res = property.values().stream().mapToInt(Set::size).sum();
-        return res > 0 ? Math.round(res / property.values().size()) : 0;
+        return !owners.isEmpty() ? Math.round( (float) cars.size() / owners.size()) : 0;
     }
 
     @Override
