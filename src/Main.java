@@ -1,5 +1,17 @@
+import java.io.IOException;
+import java.util.List;
+
 public class Main {
-    public static void main(String[] args) {
-        System.out.println("Hello world!");
+    public static void main(String[] args) throws IllegalAccessException {
+        final Book book = new Book(
+                "Effective Java",
+                "Joshua Bloch",
+                416,
+                List.of("Programming", "Java"),
+                new String[]{"Best Practices", "Java"}
+        );
+
+        String json = ReflectionGeneratorJSON.toJson(book);
+        System.out.println(json);
     }
 }
