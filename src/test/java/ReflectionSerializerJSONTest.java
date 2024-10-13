@@ -1,5 +1,7 @@
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+
 
 class ReflectionSerializerJSONTest {
     @Test
@@ -11,6 +13,24 @@ class ReflectionSerializerJSONTest {
                 List.of("Programming", "Java"),
                 new String[]{"Best Practices", "Java"}
         );
-        System.out.println(ReflectionSerializerJSON.toJson(book));
+        final String json = ReflectionSerializerJSON.toJson(book);
+        final String expected =
+                """
+                {
+                \t"title": "Effective Java",
+                \t"author": "Joshua Bloch",
+                \t"pages": 416,
+                \t"genres": ["Programming", "Java"],
+                \t"tags": ["Best Practices", "Java"]
+                }""";
+        assertEquals(expected, json);
+    }
+
+    @Test
+    void toJsonNULL() throws IllegalAccessException{
+        final Book book = null;
+        final String json = ReflectionSerializerJSON.toJson(book);
+        final String expected = "null";
+        assertEquals(expected, json);
     }
 }
