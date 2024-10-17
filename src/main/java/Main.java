@@ -1,4 +1,7 @@
-import garage.*;
+import org.garage.Car;
+import org.garage.Garage;
+import org.garage.HashGarage;
+import org.garage.Owner;
 
 import java.util.*;
 

@@ -1,4 +1,4 @@
-package garage;
+package org.garage;
 
 import java.util.Collection;
 
