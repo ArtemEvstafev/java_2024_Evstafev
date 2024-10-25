@@ -28,7 +28,7 @@ public class ReflectionSerializerJSON {
                 appendArray(value, jsonBuilder);
             }
             else if (value instanceof Collection) {
-                appendCollection((Collection) value, jsonBuilder);
+                appendCollection((  Collection) value, jsonBuilder);
             }
             else {
                 appendPrimitive(value, jsonBuilder);
