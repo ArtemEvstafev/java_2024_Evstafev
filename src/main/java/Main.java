@@ -3,8 +3,6 @@ import threadpool.ScalableThreadPool;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static java.lang.Thread.sleep;
-
 public class Main {
     public static void main(String[] args) throws InterruptedException {
         int numTasks = 20;

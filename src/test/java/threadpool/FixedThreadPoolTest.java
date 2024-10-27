@@ -3,7 +3,6 @@ package threadpool;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class FixedThreadPoolTest {
