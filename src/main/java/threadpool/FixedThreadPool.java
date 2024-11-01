@@ -3,9 +3,9 @@ package threadpool;
 import java.util.*;
 
 public class FixedThreadPool implements ThreadPool {
-    protected volatile Queue<Runnable> tasks;
+    protected final Queue<Runnable> tasks;
     protected volatile Boolean isRunning = true;
-    protected volatile List<SimpleThread> threads;
+    protected final List<SimpleThread> threads;
 
     protected class SimpleThread extends Thread {
         private boolean isFree = true;
