@@ -22,6 +22,8 @@ public class FixedThreadPool implements ThreadPool {
                             System.out.println("Меня убили");
                             Thread.currentThread().interrupt();
                             return;
+                        } finally {
+                            isFree = true;
                         }
                     }
                     task = tasks.poll();
@@ -30,6 +32,7 @@ public class FixedThreadPool implements ThreadPool {
                 if (task != null) {
                     task.run();
                 }
+                isFree = true;
             }
         }
 
@@ -120,6 +123,9 @@ public class FixedThreadPool implements ThreadPool {
                 }
             }
             if (flag) {
+                for (SimpleThread thread : threads) {
+                    thread.interrupt();
+                }
                 return;
             }
             try {
