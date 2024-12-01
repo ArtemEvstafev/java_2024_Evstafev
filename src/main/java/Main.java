@@ -1,7 +1,7 @@
 import java.util.List;
 
 public class Main {
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         final Book book = new Book(
                 "Effective Java",
                 "Joshua Bloch",
@@ -11,7 +11,7 @@ public class Main {
         );
 
 
-        String generatedCode = ClassLoaderGeneratorJSON.generateSerializer(Book.class);
+        String generatedCode = ClassLoaderSerializerJSON.generateSerializer(Book.class);
         System.out.println(generatedCode);
     }
 }

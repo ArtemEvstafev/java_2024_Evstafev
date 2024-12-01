@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ReflectionSerializerJSONTest {
     @Test
-    void toJson() throws IllegalAccessException{
+    void toJson() {
         final Book book = new Book(
                 "Effective Java",
                 "Joshua Bloch",
@@ -13,7 +13,8 @@ class ReflectionSerializerJSONTest {
                 List.of("Programming", "Java"),
                 new String[]{"Best Practices", "Java"}
         );
-        final String json = ReflectionSerializerJSON.toJson(book);
+        SerializerJSON<Book> reflectionSerializerJSON = (SerializerJSON<Book>) ReflectionSerializerJSON.generateReflectionSerializerJSON(Book.class);
+        final String json = reflectionSerializerJSON.toJson(book);
         final String expected =
                 """
                 {
@@ -27,10 +28,34 @@ class ReflectionSerializerJSONTest {
     }
 
     @Test
-    void toJsonNULL() throws IllegalAccessException{
+    void toJsonNULL() {
         final Book book = null;
-        final String json = ReflectionSerializerJSON.toJson(book);
+        SerializerJSON<Book> reflectionSerializerJSON = (ReflectionSerializerJSON<Book>) ReflectionSerializerJSON.generateReflectionSerializerJSON(Book.class);
+        final String json = reflectionSerializerJSON.toJson(book);
         final String expected = "null";
+        assertEquals(expected, json);
+    }
+
+    @Test
+    void toJsonNull() {
+        final Book book = new Book(
+                "Effective Java",
+                null,
+                416,
+                List.of("Programming", "Java"),
+                new String[]{"Best Practices", "Java"}
+        );
+        SerializerJSON<Book> reflectionSerializerJSON = (ReflectionSerializerJSON<Book>) ReflectionSerializerJSON.generateReflectionSerializerJSON(Book.class);
+        final String json = reflectionSerializerJSON.toJson(book);
+        final String expected =
+                """
+                {
+                \t"title": "Effective Java",
+                \t"author": null,
+                \t"pages": 416,
+                \t"genres": ["Programming", "Java"],
+                \t"tags": ["Best Practices", "Java"]
+                }""";
         assertEquals(expected, json);
     }
 }

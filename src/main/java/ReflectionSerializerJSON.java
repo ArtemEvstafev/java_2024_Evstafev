@@ -1,34 +1,59 @@
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-public class ReflectionSerializerJSON {
+public class ReflectionSerializerJSON<T> implements SerializerJSON<T> {
 
-    public static String toJson(Object obj) throws IllegalAccessException {
+    Collection<Field> fields;
+
+    private static final Map<Class<?>, ReflectionSerializerJSON<?>> hash = new HashMap<>();
+
+    public static SerializerJSON<?> generateReflectionSerializerJSON(Class<?> clazz){
+        return hash.computeIfAbsent(clazz, ReflectionSerializerJSON::new);
+    }
+
+    public ReflectionSerializerJSON(Class<T> clazz) {
+        if (clazz == null) {
+            return;
+        }
+        fields = List.of(clazz.getFields());
+    }
+
+    public String toJson(T obj) {
         if (obj == null) {
             return "null";
         }
 
-        Class<?> clazz = obj.getClass();
         StringBuilder jsonBuilder = new StringBuilder();
+
         jsonBuilder.append("{\n\t");
         boolean first = true;
-        for (Field field : clazz.getDeclaredFields()) {
+        for (Field field : fields) {
 
             if (!first) {
                 jsonBuilder.append(",\n\t");
             }
             first = false;
-
-            field.setAccessible(true);
             jsonBuilder.append("\"").append(field.getName()).append("\": ");
-            Object value = field.get(obj);
+            Object value;
+            try {
+                value = field.get(obj);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException("object isn't an instance of the class or interface declaring the underlying field or Field is private", e);
+            }
+            if (value == null) {
+                jsonBuilder.append("null");
+                continue;
+            }
 
-            if (field.get(obj).getClass().isArray()) {
+            if (value.getClass().isArray()) {
                 appendArray(value, jsonBuilder);
             }
             else if (value instanceof Collection) {
-                appendCollection((  Collection) value, jsonBuilder);
+                appendCollection((Collection<?>) value, jsonBuilder);
             }
             else {
                 appendPrimitive(value, jsonBuilder);
@@ -38,7 +63,7 @@ public class ReflectionSerializerJSON {
         return jsonBuilder.toString();
     }
 
-    private static void appendCollection(Collection value, StringBuilder jsonBuilder) {
+    private void appendCollection(Collection<?> value, StringBuilder jsonBuilder) {
         jsonBuilder.append("[");
         boolean firstInCol = true;
         for (Object element : value) {
@@ -51,7 +76,7 @@ public class ReflectionSerializerJSON {
         jsonBuilder.append("]");
     }
 
-    private static void appendArray(Object value, StringBuilder jsonBuilder) {
+    private void appendArray(Object value, StringBuilder jsonBuilder) {
         jsonBuilder.append("[");
         for (int i = 0; i < Array.getLength(value); i++) {
             if (i > 0) {
@@ -62,11 +87,11 @@ public class ReflectionSerializerJSON {
         jsonBuilder.append("]");
     }
 
-    private static void appendPrimitive(Object value, StringBuilder jsonBuilder) {
-        if (value instanceof String) {
-            jsonBuilder.append("\"").append(value).append("\"");
-        } else {
+    private void appendPrimitive(Object value, StringBuilder jsonBuilder) {
+        if (value instanceof Number || value instanceof Boolean) {
             jsonBuilder.append(value);
+        } else {
+            jsonBuilder.append(String.format("\"%s\"", value.toString()));
         }
     }
 }
