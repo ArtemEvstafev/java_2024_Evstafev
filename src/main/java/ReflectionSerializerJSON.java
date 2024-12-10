@@ -7,13 +7,7 @@ import java.util.Map;
 
 public class ReflectionSerializerJSON<T> implements SerializerJSON<T> {
 
-    Collection<Field> fields;
-
-    private static final Map<Class<?>, ReflectionSerializerJSON<?>> hash = new HashMap<>();
-
-    public static SerializerJSON<?> generateReflectionSerializerJSON(Class<?> clazz){
-        return hash.computeIfAbsent(clazz, ReflectionSerializerJSON::new);
-    }
+    private Collection<Field> fields;
 
     public ReflectionSerializerJSON(Class<T> clazz) {
         if (clazz == null) {
@@ -39,28 +33,38 @@ public class ReflectionSerializerJSON<T> implements SerializerJSON<T> {
             first = false;
             jsonBuilder.append("\"").append(field.getName()).append("\": ");
             Object value;
-            try {
-                value = field.get(obj);
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException("object isn't an instance of the class or interface declaring the underlying field or Field is private", e);
-            }
-            if (value == null) {
-                jsonBuilder.append("null");
-                continue;
-            }
-
-            if (value.getClass().isArray()) {
-                appendArray(value, jsonBuilder);
-            }
-            else if (value instanceof Collection) {
-                appendCollection((Collection<?>) value, jsonBuilder);
-            }
-            else {
-                appendPrimitive(value, jsonBuilder);
-            }
+            value = getValueIfValid(obj, field, jsonBuilder);
+            if (value == null) continue;
+            appendValue(value, jsonBuilder);
         }
         jsonBuilder.append("\n}");
         return jsonBuilder.toString();
+    }
+
+    private void appendValue(Object value, StringBuilder jsonBuilder) {
+        if (value.getClass().isArray()) {
+            appendArray(value, jsonBuilder);
+        }
+        else if (value instanceof Collection) {
+            appendCollection((Collection<?>) value, jsonBuilder);
+        }
+        else {
+            appendPrimitive(value, jsonBuilder);
+        }
+    }
+
+    private <T> Object getValueIfValid(T obj, Field field, StringBuilder jsonBuilder) {
+        Object value;
+        try {
+            value = field.get(obj);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException("object isn't an instance of the class or interface declaring the underlying field or Field is private", e);
+        }
+        if (value == null) {
+            jsonBuilder.append("null");
+            return null;
+        }
+        return value;
     }
 
     private void appendCollection(Collection<?> value, StringBuilder jsonBuilder) {

@@ -1,11 +1,10 @@
-import net.openhft.compiler.CompilerUtils;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class ClassLoaderSerializerJSONTest {
+class ClassLoaderSerializerJSONFactoryTest {
 
     @Test
     void generateSerializer() {
@@ -21,7 +20,7 @@ class ClassLoaderSerializerJSONTest {
 //        Class<?> generatedSerializerJSON = CompilerUtils.CACHED_COMPILER.loadFromJava("GeneratedSerializerJSON", generatedCode);
 //        final String json = (String) generatedSerializerJSON.getMethod("toJson", Book.class).invoke(generatedSerializerJSON, book);
 
-        SerializerJSON<Book> classLoadeSerializerJSON = (SerializerJSON<Book>) ClassLoaderSerializerJSON.generateClassLoadeSerializerJSON(Book.class);
+        SerializerJSON<Book> classLoadeSerializerJSON = (SerializerJSON<Book>) ClassLoaderSerializerJSONFactory.generateClassLoadeSerializerJSON(Book.class);
         final String json = classLoadeSerializerJSON.toJson(book);
 
         final String expected =
@@ -40,7 +39,7 @@ class ClassLoaderSerializerJSONTest {
     void generateSerializerNULL() {
         Book book = null;
 
-        SerializerJSON<Book> classLoadeSerializerJSON = (SerializerJSON<Book>) ClassLoaderSerializerJSON.generateClassLoadeSerializerJSON(Book.class);
+        SerializerJSON<Book> classLoadeSerializerJSON = (SerializerJSON<Book>) ClassLoaderSerializerJSONFactory.generateClassLoadeSerializerJSON(Book.class);
         final String json = classLoadeSerializerJSON.toJson(book);
 
         final String expected = "null";

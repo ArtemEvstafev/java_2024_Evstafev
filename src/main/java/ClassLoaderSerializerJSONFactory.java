@@ -6,15 +6,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ClassLoaderSerializerJSON {
+public class ClassLoaderSerializerJSONFactory {
 
-    Collection<Field> fields;
+    private Collection<Field> fields;
 
     private static final Map<Class<?>, SerializerJSON<?>> hash = new HashMap<>();
 
     public static SerializerJSON<?> generateClassLoadeSerializerJSON(Class<?> clazz) {
         return hash.computeIfAbsent(clazz, k -> {
-            String generatedHumanCode = ClassLoaderSerializerJSON.generateSerializer(Book.class);
+            String generatedHumanCode = ClassLoaderSerializerJSONFactory.generateSerializer(Book.class);
             Class<?> generatedSerializerJSON = null;
             try {
                 generatedSerializerJSON = CompilerUtils.CACHED_COMPILER.loadFromJava("GeneratedSerializerJSON", generatedHumanCode);
@@ -29,7 +29,7 @@ public class ClassLoaderSerializerJSON {
         });
     }
 
-    public ClassLoaderSerializerJSON(Class<?> clazz) {
+    public ClassLoaderSerializerJSONFactory(Class<?> clazz) {
         if (clazz == null) {
             return;
         }
@@ -40,7 +40,7 @@ public class ClassLoaderSerializerJSON {
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append("public class GeneratedSerializerJSON implements SerializerJSON<").append(clazz.getName()).append("> {\n")
+        sb.append("public class ClassLoaderSerializerJSON implements SerializerJSON<").append(clazz.getName()).append("> {\n")
           .append("\tpublic GeneratedSerializerJSON() {}\n")
           .append("\tpublic String toJson(").append(clazz.getName()).append(" obj) {\n")
           .append("\tif (obj == null) {\n")

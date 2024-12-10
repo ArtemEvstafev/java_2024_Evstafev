@@ -11,7 +11,7 @@ public class Main {
         );
 
 
-        String generatedCode = ClassLoaderSerializerJSON.generateSerializer(Book.class);
+        String generatedCode = ClassLoaderSerializerJSONFactory.generateSerializer(Book.class);
         System.out.println(generatedCode);
     }
 }

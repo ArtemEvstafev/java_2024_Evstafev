@@ -3,7 +3,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 
-class ReflectionSerializerJSONTest {
+class ReflectionSerializerJSONFactoryTest {
     @Test
     void toJson() {
         final Book book = new Book(
@@ -13,7 +13,7 @@ class ReflectionSerializerJSONTest {
                 List.of("Programming", "Java"),
                 new String[]{"Best Practices", "Java"}
         );
-        SerializerJSON<Book> reflectionSerializerJSON = (SerializerJSON<Book>) ReflectionSerializerJSON.generateReflectionSerializerJSON(Book.class);
+        SerializerJSON<Book> reflectionSerializerJSON = (SerializerJSON<Book>) ReflectionSerializerJSONFactory.generateReflectionSerializerJSON(Book.class);
         final String json = reflectionSerializerJSON.toJson(book);
         final String expected =
                 """
@@ -30,7 +30,7 @@ class ReflectionSerializerJSONTest {
     @Test
     void toJsonNULL() {
         final Book book = null;
-        SerializerJSON<Book> reflectionSerializerJSON = (ReflectionSerializerJSON<Book>) ReflectionSerializerJSON.generateReflectionSerializerJSON(Book.class);
+        SerializerJSON<Book> reflectionSerializerJSON = (ReflectionSerializerJSON<Book>) ReflectionSerializerJSONFactory.generateReflectionSerializerJSON(Book.class);
         final String json = reflectionSerializerJSON.toJson(book);
         final String expected = "null";
         assertEquals(expected, json);
@@ -45,7 +45,7 @@ class ReflectionSerializerJSONTest {
                 List.of("Programming", "Java"),
                 new String[]{"Best Practices", "Java"}
         );
-        SerializerJSON<Book> reflectionSerializerJSON = (ReflectionSerializerJSON<Book>) ReflectionSerializerJSON.generateReflectionSerializerJSON(Book.class);
+        SerializerJSON<Book> reflectionSerializerJSON = (ReflectionSerializerJSON<Book>) ReflectionSerializerJSONFactory.generateReflectionSerializerJSON(Book.class);
         final String json = reflectionSerializerJSON.toJson(book);
         final String expected =
                 """
