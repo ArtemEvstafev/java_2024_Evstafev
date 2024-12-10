@@ -9,13 +9,17 @@ public class ScalableThreadPool extends FixedThreadPool implements ThreadPool {
                           maxNumThread;
 
     public ScalableThreadPool(int minNumThread, int maxNumThread) {
-        super(min(minNumThread, maxNumThread));
-        this.minNumThread = min(minNumThread, maxNumThread);
-        this.maxNumThread = max(maxNumThread, minNumThread);
+        super(minNumThread);
+        if(minNumThread > maxNumThread) {
+            throw new IllegalArgumentException("minNumThread > maxNumThread");
+        }
+        this.minNumThread = minNumThread;
+        this.maxNumThread = maxNumThread;
     }
 
     @Override
     public void execute(Runnable task) {
+        if (task == null) {return;}
         super.execute(task);
         synchronized (threads) {
             while (!hasAnyTasks() && threads.size() > minNumThread) {
@@ -30,7 +34,7 @@ public class ScalableThreadPool extends FixedThreadPool implements ThreadPool {
 
             while (!hasAnyFreeThread() && threads.size() < maxNumThread) {
                 for (int i = 0; i < maxNumThread - minNumThread; i++) {
-                    SimpleThread newThread = new SimpleThread();
+                    SimpleThread newThread = new SimpleThread(this);
                     threads.add(newThread);
                     newThread.start();
                 }
@@ -38,12 +42,14 @@ public class ScalableThreadPool extends FixedThreadPool implements ThreadPool {
         }
     }
 
-    private synchronized boolean hasAnyFreeThread() {
-        for (SimpleThread thread : threads) {
-            if (thread.isFree()) {
-                return true;
+    private boolean hasAnyFreeThread() {
+        synchronized(threads) {
+            for (SimpleThread thread : threads) {
+                if (thread.isFree()) {
+                    return true;
+                }
             }
+            return false;
         }
-        return false;
     }
 }

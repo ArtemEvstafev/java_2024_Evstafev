@@ -10,7 +10,6 @@ public class FixedThreadPoolTest {
     public void testSimpleThreadPool() throws Exception {
         int runnableCount = 10;
         final AtomicInteger count = new AtomicInteger(0);
-
         FixedThreadPool threadpool = new FixedThreadPool(10);
 
         threadpool.start();

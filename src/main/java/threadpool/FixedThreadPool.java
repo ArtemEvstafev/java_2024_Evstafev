@@ -1,62 +1,24 @@
 package threadpool;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Queue;
 
 public class FixedThreadPool implements ThreadPool {
     protected final Queue<Runnable> tasks;
-    protected volatile Boolean isRunning = true;
+    protected volatile boolean isRunning = false;
     protected final List<SimpleThread> threads;
-
-    protected class SimpleThread extends Thread {
-        private boolean isFree = true;
-
-        @Override
-        public void run() {
-            Runnable task;
-            while (isRunning) {
-                synchronized (tasks) {
-                    while (tasks.isEmpty() && isRunning) {
-                        try {
-                            tasks.wait();
-                        } catch (InterruptedException e) {
-                            System.out.println("Меня убили");
-                            Thread.currentThread().interrupt();
-                            return;
-                        } finally {
-                            isFree = true;
-                        }
-                    }
-                    task = tasks.poll();
-                    isFree = false;
-                }
-                if (task != null) {
-                    task.run();
-                }
-                isFree = true;
-            }
-        }
-
-        public boolean isFree() {
-            return isFree;
-        }
-    }
-
-    protected class ThreadPoolException extends RuntimeException {
-        public ThreadPoolException(Throwable cause) {
-            super(cause);
-        }
-    }
 
     public FixedThreadPool(int numThreads) {
         if (numThreads <= 0) {
             throw new IllegalArgumentException("numThreads must be greater than 0");
         }
-        this.tasks = new LinkedList<>() {
-        };
+        this.tasks = new ArrayDeque<>();
         this.threads = new ArrayList<>();
 
         for (int i = 0; i < numThreads; i++) {
-            threads.add(new SimpleThread());
+            threads.add(new SimpleThread(this));
         }
     }
 
@@ -64,15 +26,29 @@ public class FixedThreadPool implements ThreadPool {
         this(Runtime.getRuntime().availableProcessors());
     }
 
+    public boolean isRunning() {
+        return isRunning;
+    }
+
+    public Queue<Runnable> getTasks() {
+        return tasks;
+    }
+
     @Override
-    public void start() {
-        for (Thread thread : threads) {
-            thread.start();
+    public synchronized void start() {
+        if (!isRunning) {
+            isRunning = true;
+            for (Thread thread : threads) {
+                thread.start();
+            }
         }
     }
 
     @Override
     public void execute(Runnable task) {
+        if (task == null) {
+            return;
+        }
         if (!isRunning) {
             throw new IllegalStateException("ThreadPool has been stopped.");
         }
