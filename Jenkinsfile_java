@@ -7,11 +7,11 @@ pipeline {
 
     tools {
         maven 'Maven_3.9.9'
-        jdk 'JDR_Default'
+        jdk 'JDK_Default'
     }
 
     environment {
-        JAVA_HOME = tool 'JDR_Default'
+        JAVA_HOME = tool 'JDK_Default'
         MAVEN_HOME = tool 'Maven_3.9.9'
     }
 
