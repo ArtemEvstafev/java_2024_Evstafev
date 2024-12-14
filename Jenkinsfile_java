@@ -6,13 +6,13 @@ pipeline {
     }
 
     tools {
-        maven 'Maven_3.8.1'
-        jdk 'JDK_11'
+        maven 'Maven_3.9.9'
+        jdk 'JDR_Default'
     }
 
     environment {
-        JAVA_HOME = tool 'JDK_11'
-        MAVEN_HOME = tool 'Maven_3.8.1'
+        JAVA_HOME = tool 'JDR_Default'
+        MAVEN_HOME = tool 'Maven_3.9.9'
     }
 
     stages {
